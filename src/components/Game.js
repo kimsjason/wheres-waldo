@@ -8,6 +8,11 @@ const Game = (props) => {
     { pokemon: "Walrein", found: false },
   ]);
   const [selectionCoordinates, setSelectionCoordinates] = useState([]);
+  const [timer, setTimer] = useState(0);
+
+  useEffect(() => {
+    startTimer();
+  }, []);
 
   const displaySelectionMenu = (e) => {
     const selectionMenu = document.querySelector(".selection-menu");
@@ -69,8 +74,27 @@ const Game = (props) => {
     console.log(xMin, xMax, "\n", yMin, yMax);
   };
 
+  const startTimer = () => {
+    setInterval(() => {
+      setTimer((prevTime) => prevTime + 1);
+    }, 1000);
+  };
+
+  const formatTimer = (timer) => {
+    const minutes = ("0" + Math.floor((timer / 60) % 60)).slice(-2);
+    const seconds = ("0" + Math.floor(timer % 60)).slice(-2);
+
+    const formattedTimer = `${minutes}:${seconds}`;
+    return formattedTimer;
+  };
+
   return (
     <div className="game">
+      <div className="header">
+        <div className="logo">Where's Waldo</div>
+        <div className="timer">{formatTimer(timer)}</div>
+        <div className="targets">Targets</div>
+      </div>
       <WaterPokemon className="water-pokemon" onClick={handleSelection} />
       <div className="selection-menu hidden">
         {targets.map((target) => {
