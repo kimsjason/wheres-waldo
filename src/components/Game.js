@@ -1,12 +1,13 @@
 import { ReactComponent as WaterPokemon } from "../assets/water-pokemon.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const Game = () => {
+const Game = (props) => {
   const [targets, setTargets] = useState([
     { pokemon: "Quagsire", found: false },
     { pokemon: "Corsola", found: false },
     { pokemon: "Walrein", found: false },
   ]);
+  const [selectionCoordinates, setSelectionCoordinates] = useState([]);
 
   const displaySelectionMenu = (e) => {
     const selectionMenu = document.querySelector(".selection-menu");
@@ -20,13 +21,65 @@ const Game = () => {
     element.style.top = `${y + 25}px`;
   };
 
+  const handleSelection = (e) => {
+    setSelectionCoordinates([e.pageX, e.pageY]);
+    displaySelectionMenu(e);
+  };
+
+  const getTargetsFromDatabase = async () => {
+    const targets = await props.getTargetsFromDatabase();
+    return targets;
+  };
+
+  const getTargetPokemon = (pokemonName, targets) => {
+    const [pokemon] = targets.filter(
+      (target) => target.pokemon === pokemonName
+    );
+    return pokemon;
+  };
+
+  const evaluateSelection = async (e) => {
+    const targetPokemon = e.target.innerHTML;
+    const targets = await getTargetsFromDatabase();
+    const pokemon = getTargetPokemon(targetPokemon, targets);
+
+    const [xMin, xMax] = [
+      pokemon.center.x - pokemon.radius,
+      pokemon.center.x + pokemon.radius,
+    ];
+
+    const [yMin, yMax] = [
+      pokemon.center.y - pokemon.radius,
+      pokemon.center.y + pokemon.radius,
+    ];
+
+    // evaluate if selection is within target range
+    if (
+      selectionCoordinates[0] >= xMin &&
+      selectionCoordinates[0] <= xMax &&
+      selectionCoordinates[1] >= yMin &&
+      selectionCoordinates[1] <= yMax
+    ) {
+      console.log("You found it!");
+    } else {
+      console.log("try again!");
+    }
+    // delete
+    console.log(selectionCoordinates);
+    console.log(xMin, xMax, "\n", yMin, yMax);
+  };
+
   return (
     <div className="game">
-      <WaterPokemon className="water-pokemon" onClick={displaySelectionMenu} />
+      <WaterPokemon className="water-pokemon" onClick={handleSelection} />
       <div className="selection-menu hidden">
         {targets.map((target) => {
           return (
-            <div key={target.pokemon} className={target.pokemon}>
+            <div
+              key={target.pokemon}
+              className={target.pokemon}
+              onClick={evaluateSelection}
+            >
               {target.pokemon}
             </div>
           );
