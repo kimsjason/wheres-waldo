@@ -2,7 +2,7 @@ import Game from "./components/Game";
 import "./styles/App.css";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { useEffect } from "react";
 
 function App() {
@@ -38,7 +38,7 @@ function App() {
       },
       {
         pokemon: "Corsola",
-        cemter: {
+        center: {
           x: 1160,
           y: 1570,
         },
@@ -65,9 +65,22 @@ function App() {
     });
   };
 
+  const getTargetsFromDatabase = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "targets"));
+      const targets = [];
+      querySnapshot.forEach((doc) => {
+        targets.push(doc.data());
+      });
+      return targets;
+    } catch (e) {
+      console.error("Error retrieving targets from the database", e);
+    }
+  };
+
   return (
     <div className="App">
-      <Game />
+      <Game getTargetsFromDatabase={getTargetsFromDatabase} />
     </div>
   );
 }
