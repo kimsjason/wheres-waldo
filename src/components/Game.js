@@ -1,18 +1,45 @@
-import { ReactComponent as WaterPokemon } from "../assets/water-pokemon.svg";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Game = (props) => {
-  const [targets, setTargets] = useState([
-    { pokemon: "Quagsire", found: false },
-    { pokemon: "Corsola", found: false },
-    { pokemon: "Walrein", found: false },
-  ]);
-  const [selectionCoordinates, setSelectionCoordinates] = useState([]);
+  const [gameOver, setGameOver] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [targets, setTargets] = useState([
+    { name: "Quagsire", found: false },
+    { name: "Corsola", found: false },
+    { name: "Walrein", found: false },
+  ]);
+  const [clickCoordinates, setClickCoordinates] = useState([]);
+  const [message, setMessage] = useState();
 
   useEffect(() => {
     startTimer();
-  }, []);
+
+    let interval;
+    if (!gameOver) {
+      interval = setInterval(() => {
+        setTimer((prevTime) => prevTime + 1);
+      }, 1000);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [gameOver]);
+
+  const startTimer = async () => {
+    await props.startTimer();
+  };
+
+  const stopTimer = async () => {
+    await props.stopTimer();
+  };
+
+  const formatTimer = (timer) => {
+    const minutes = ("0" + Math.floor((timer / 60) % 60)).slice(-2);
+    const seconds = ("0" + Math.floor(timer % 60)).slice(-2);
+
+    const formattedTimer = `${minutes}:${seconds}`;
+    return formattedTimer;
+  };
 
   const displaySelectionMenu = (e) => {
     const selectionMenu = document.querySelector(".selection-menu");
@@ -26,88 +53,113 @@ const Game = (props) => {
     element.style.top = `${y + 25}px`;
   };
 
-  const handleSelection = (e) => {
-    setSelectionCoordinates([e.pageX, e.pageY]);
+  // Returns information about targets (name, coordinates, radius) from Firebase
+  const getTargetInfo = async () => {
+    const targetInfo = await props.getTargetInfo();
+    return targetInfo;
+  };
+
+  // Returns information of a single target from a targets array
+  const getTarget = (targetName, targets) => {
+    const [target] = targets.filter((target) => target.name === targetName);
+    return target;
+  };
+
+  // Evaluate if click is within target range and update states, accordingly
+  const evaluateTarget = (target) => {
+    if (
+      clickCoordinates[0] >= target.xMin &&
+      clickCoordinates[0] <= target.xMax &&
+      clickCoordinates[1] >= target.yMin &&
+      clickCoordinates[1] <= target.yMax
+    ) {
+      const targetName = target.name;
+      const targetsCopy = [...targets];
+      const updatedTargets = targetsCopy.map((target) => {
+        if (target.name === targetName) {
+          target.found = true;
+        }
+        return target;
+      });
+      setTargets(updatedTargets);
+      setMessage(`You found ${target.name}!`);
+      if (checkFoundAll()) {
+        endGame();
+      }
+    } else {
+      setMessage("Try again!");
+    }
+  };
+
+  // Returns x, y coordinates (in percentages) of mouse click relative to image
+  const getRelativeCoordinates = (e, element) => {
+    const width = parseInt(window.getComputedStyle(element).width.slice(0, -2));
+    const height = parseInt(
+      window.getComputedStyle(element).height.slice(0, -2)
+    );
+    const x = Math.round((e.pageX / width) * 100);
+    const y = Math.round((e.pageY / height) * 100);
+
+    return [x, y];
+  };
+
+  // Returns true if all characters found, otherwise false
+  const checkFoundAll = () => {
+    return targets.every((target) => target.found === true);
+  };
+
+  const endGame = () => {
+    setGameOver(true);
+    stopTimer();
+  };
+
+  // CLICK EVENTS
+  const handleClickBoard = (e) => {
+    const board = document.querySelector(".water-pokemon");
+    const [x, y] = getRelativeCoordinates(e, board);
+    setClickCoordinates([x, y]);
     displaySelectionMenu(e);
   };
 
-  const getTargetsFromDatabase = async () => {
-    const targets = await props.getTargetsFromDatabase();
-    return targets;
-  };
+  const handleClickTarget = async (e) => {
+    const targetName = e.target.innerHTML;
+    const targetInfo = await getTargetInfo();
+    const target = getTarget(targetName, targetInfo);
 
-  const getTargetPokemon = (pokemonName, targets) => {
-    const [pokemon] = targets.filter(
-      (target) => target.pokemon === pokemonName
-    );
-    return pokemon;
-  };
-
-  const evaluateSelection = async (e) => {
-    const targetPokemon = e.target.innerHTML;
-    const targets = await getTargetsFromDatabase();
-    const pokemon = getTargetPokemon(targetPokemon, targets);
-
-    const [xMin, xMax] = [
-      pokemon.center.x - pokemon.radius,
-      pokemon.center.x + pokemon.radius,
-    ];
-
-    const [yMin, yMax] = [
-      pokemon.center.y - pokemon.radius,
-      pokemon.center.y + pokemon.radius,
-    ];
-
-    // evaluate if selection is within target range
-    if (
-      selectionCoordinates[0] >= xMin &&
-      selectionCoordinates[0] <= xMax &&
-      selectionCoordinates[1] >= yMin &&
-      selectionCoordinates[1] <= yMax
-    ) {
-      console.log("You found it!");
-    } else {
-      console.log("try again!");
-    }
-    // delete
-    console.log(selectionCoordinates);
-    console.log(xMin, xMax, "\n", yMin, yMax);
-  };
-
-  const startTimer = () => {
-    setInterval(() => {
-      setTimer((prevTime) => prevTime + 1);
-    }, 1000);
-  };
-
-  const formatTimer = (timer) => {
-    const minutes = ("0" + Math.floor((timer / 60) % 60)).slice(-2);
-    const seconds = ("0" + Math.floor(timer % 60)).slice(-2);
-
-    const formattedTimer = `${minutes}:${seconds}`;
-    return formattedTimer;
+    evaluateTarget(target);
+    console.log(targets);
   };
 
   return (
     <div className="game">
-      <div className="header">
-        <div className="logo">Where's Waldo</div>
-        <div className="timer">{formatTimer(timer)}</div>
-        <div className="targets">Targets</div>
+      <div className="fixed">
+        <div className="header">
+          <div className="logo">Where's Waldo</div>
+          <div className="timer">{formatTimer(timer)}</div>
+          <div className="targets">Targets</div>
+        </div>
+        <div className="display-message">{message}</div>
       </div>
-      <WaterPokemon className="water-pokemon" onClick={handleSelection} />
-      <div className="selection-menu hidden">
-        {targets.map((target) => {
-          return (
-            <div
-              key={target.pokemon}
-              className={target.pokemon}
-              onClick={evaluateSelection}
-            >
-              {target.pokemon}
-            </div>
-          );
-        })}
+      <div className="board">
+        <img
+          className="water-pokemon"
+          src={require("../assets/water-pokemon.png")}
+          onClick={handleClickBoard}
+          alt="game board"
+        />
+        <div className="selection-menu hidden">
+          {targets.map((target) => {
+            return (
+              <div
+                key={target.name}
+                className={target.name}
+                onClick={handleClickTarget}
+              >
+                {target.name}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
