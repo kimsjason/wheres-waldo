@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const Game = (props) => {
   const [gameOver, setGameOver] = useState(false);
@@ -130,13 +130,29 @@ const Game = (props) => {
     console.log(targets);
   };
 
+  const handleClickCharacterLegend = () => {
+    const characterLegend = document.querySelector(".character-legend");
+    characterLegend.classList.toggle("hidden");
+  };
+
   return (
     <div className="game">
       <div className="fixed">
         <div className="header">
           <div className="logo">Where's Waldo</div>
           <div className="timer">{formatTimer(timer)}</div>
-          <div className="targets">Targets</div>
+          <div className="targets" onClick={handleClickCharacterLegend}>
+            Characters
+            <div className="character-legend hidden">
+              {targets.map((target) => {
+                return (
+                  <div key={target.name} className={target.name}>
+                    {target.name}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
         <div className="display-message">{message}</div>
       </div>
