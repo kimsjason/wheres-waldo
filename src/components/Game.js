@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Results from "./Results";
 
 const Game = (props) => {
   const [gameOver, setGameOver] = useState(false);
@@ -12,10 +13,9 @@ const Game = (props) => {
   const [message, setMessage] = useState();
 
   useEffect(() => {
-    startTimer();
-
     let interval;
     if (!gameOver) {
+      startTimer();
       interval = setInterval(() => {
         setTimer((prevTime) => prevTime + 1);
       }, 1000);
@@ -39,6 +39,18 @@ const Game = (props) => {
 
     const formattedTimer = `${minutes}:${seconds}`;
     return formattedTimer;
+  };
+
+  // Returns x, y coordinates (in percentages) of mouse click relative to image
+  const getRelativeCoordinates = (e, element) => {
+    const width = parseInt(window.getComputedStyle(element).width.slice(0, -2));
+    const height = parseInt(
+      window.getComputedStyle(element).height.slice(0, -2)
+    );
+    const x = Math.round((e.pageX / width) * 100);
+    const y = Math.round((e.pageY / height) * 100);
+
+    return [x, y];
   };
 
   const displaySelectionMenu = (e) => {
@@ -91,21 +103,13 @@ const Game = (props) => {
     }
   };
 
-  // Returns x, y coordinates (in percentages) of mouse click relative to image
-  const getRelativeCoordinates = (e, element) => {
-    const width = parseInt(window.getComputedStyle(element).width.slice(0, -2));
-    const height = parseInt(
-      window.getComputedStyle(element).height.slice(0, -2)
-    );
-    const x = Math.round((e.pageX / width) * 100);
-    const y = Math.round((e.pageY / height) * 100);
-
-    return [x, y];
-  };
-
   // Returns true if all characters found, otherwise false
   const checkFoundAll = () => {
     return targets.every((target) => target.found === true);
+  };
+
+  const onSubmitName = (e) => {
+    props.onSubmitName(e);
   };
 
   const endGame = () => {
@@ -137,26 +141,24 @@ const Game = (props) => {
 
   return (
     <div className="game">
-      <div className="fixed">
-        <div className="header">
-          <div className="logo">Where's Waldo</div>
-          <div className="timer">{formatTimer(timer)}</div>
-          <div className="targets" onClick={handleClickCharacterLegend}>
-            Characters
-            <div className="character-legend hidden">
-              {targets.map((target) => {
-                return (
-                  <div key={target.name} className={target.name}>
-                    {target.name}
-                  </div>
-                );
-              })}
-            </div>
+      <div className="header">
+        <div className="logo">Where's Waldo</div>
+        <div className="timer">{formatTimer(timer)}</div>
+        <div className="targets" onClick={handleClickCharacterLegend}>
+          Characters
+          <div className="character-legend hidden">
+            {targets.map((target) => {
+              return (
+                <div key={target.name} className={target.name}>
+                  {target.name}
+                </div>
+              );
+            })}
           </div>
         </div>
-        <div className="display-message">{message}</div>
       </div>
       <div className="board">
+        <div className="display-message">{message}</div>
         <img
           className="water-pokemon"
           src={require("../assets/water-pokemon.png")}
@@ -177,6 +179,7 @@ const Game = (props) => {
           })}
         </div>
       </div>
+      {gameOver ? <Results onSubmitName={onSubmitName} /> : ""}
     </div>
   );
 };

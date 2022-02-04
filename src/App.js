@@ -12,7 +12,6 @@ import "./styles/App.css";
 
 function App() {
   const [docRef, setDocRef] = useState();
-  // let timeDocID = "";
   const boards = [
     {
       board: "pokemon",
@@ -98,12 +97,24 @@ function App() {
     }
   };
 
+  const handleSubmitName = async (e) => {
+    const name = e.target.querySelector("input[type=text]").value;
+    try {
+      await updateDoc(docRef, {
+        name: name,
+      });
+    } catch (e) {
+      console.log("Error updating document: ", e);
+    }
+  };
+
   return (
     <div className="App">
       <Game
-        getTargetInfo={getTargetInfo}
         startTimer={startTimer}
         stopTimer={stopTimer}
+        getTargetInfo={getTargetInfo}
+        onSubmitName={handleSubmitName}
       />
     </div>
   );
