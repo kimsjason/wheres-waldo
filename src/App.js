@@ -8,7 +8,9 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import Game from "./components/Game";
+import Home from "./components/Home";
 import "./styles/App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
   const [docRef, setDocRef] = useState();
@@ -49,6 +51,7 @@ function App() {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore();
 
+  // Record player start time in a new Firebase document
   const startTimer = async () => {
     const record = { name: "", startTime: new Date(), endTime: "" };
     try {
@@ -59,6 +62,7 @@ function App() {
     }
   };
 
+  // Record player end time in an existing Firebase document
   const stopTimer = async () => {
     try {
       await updateDoc(docRef, {
@@ -97,6 +101,7 @@ function App() {
     }
   };
 
+  // CLICK EVENTS
   const handleSubmitName = async (e) => {
     const name = e.target.querySelector("input[type=text]").value;
     try {
@@ -110,12 +115,22 @@ function App() {
 
   return (
     <div className="App">
-      <Game
-        startTimer={startTimer}
-        stopTimer={stopTimer}
-        getTargetInfo={getTargetInfo}
-        onSubmitName={handleSubmitName}
-      />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home boards={boards} />} />
+          <Route
+            path="/game"
+            element={
+              <Game
+                startTimer={startTimer}
+                stopTimer={stopTimer}
+                getTargetInfo={getTargetInfo}
+                onSubmitName={handleSubmitName}
+              />
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
