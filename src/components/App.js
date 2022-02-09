@@ -7,17 +7,20 @@ import {
   getDocs,
   updateDoc,
 } from "firebase/firestore";
-import Game from "./components/Game";
-import Home from "./components/Home";
-import "./styles/App.css";
+import Home from "./Home";
+import Game from "./Game";
+import Leaderboard from "./Leaderboard";
+import "../styles/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
   const [docRef, setDocRef] = useState();
+  const [leaderboard, setLeaderboard] = useState([]);
   const boards = [
     {
-      board: "pokemon",
-      imagePath: "../assets/water-pokemon.svg",
+      board: "Water-Type Pokemon - Blastoise Map",
+      credits: "credits...",
+      imagePath: require("../assets/water-pokemon.png"),
       targets: [
         {
           name: "Quagsire",
@@ -25,16 +28,36 @@ function App() {
           xMax: "91",
           yMin: "20",
           yMax: "34",
+          imagePath: require("../assets/quagsire.png"),
+          difficulty: "easy",
         },
-        { name: "Corsola", xMin: "66", xMax: "80", yMin: "74", yMax: "83" },
-        { name: "Walrein", xMin: "25", xMax: "35", yMin: "63", yMax: "75" },
+        {
+          name: "Corsola",
+          xMin: "66",
+          xMax: "80",
+          yMin: "74",
+          yMax: "83",
+          imagePath: require("../assets/corsola.png"),
+          difficulty: "medium",
+        },
+        {
+          name: "Walrein",
+          xMin: "25",
+          xMax: "35",
+          yMin: "63",
+          yMax: "75",
+          imagePath: require("../assets/walrein.png"),
+          difficulty: "hard",
+        },
       ],
     },
   ];
 
-  useEffect(() => {
+  useEffect(async () => {
     // Uncomment line below to add targets to the database
     // addTargetsToDatabase();
+    const leaderboard = await getLeaderboard();
+    setLeaderboard(leaderboard);
   }, []);
 
   // Configure & initialize Firebase
@@ -71,6 +94,14 @@ function App() {
     } catch (e) {
       console.log("Error updating document: ", e);
     }
+  };
+
+  const formatTime = (time) => {
+    const minutes = ("0" + Math.floor((time / 60) % 60)).slice(-2);
+    const seconds = ("0" + Math.floor(time % 60)).slice(-2);
+
+    const formattedTime = `${minutes}:${seconds}`;
+    return formattedTime;
   };
 
   // Add targets to Cloud Firestore collection called 'targets'
@@ -113,6 +144,36 @@ function App() {
     }
   };
 
+  const getLeaderboard = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "times"));
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        data.push(doc.data());
+      });
+      // Filter for records with a valid name - player finished game & entered name
+      const leaderboard = data.filter((record) => {
+        return record.name !== "";
+      });
+      sortLeaderboard(leaderboard);
+      return leaderboard;
+    } catch (e) {
+      console.error("Error retrieving times from the database", e);
+    }
+  };
+
+  const sortLeaderboard = (leaderboard) => {
+    leaderboard.sort((a, b) => {
+      if (a.endTime - a.startTime > b.endTime - b.startTime) {
+        return 1;
+      } else if (a.endTime - a.startTime < b.endTime - b.startTime) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+  };
+
   return (
     <div className="App">
       <BrowserRouter>
@@ -122,10 +183,22 @@ function App() {
             path="/game"
             element={
               <Game
+                boards={boards}
                 startTimer={startTimer}
                 stopTimer={stopTimer}
+                formatTime={formatTime}
                 getTargetInfo={getTargetInfo}
                 onSubmitName={handleSubmitName}
+              />
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <Leaderboard
+                leaderboard={leaderboard}
+                getLeaderboard={getLeaderboard}
+                formatTime={formatTime}
               />
             }
           />
