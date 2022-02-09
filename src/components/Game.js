@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Results from "./Results";
 
 const Game = (props) => {
@@ -15,7 +16,8 @@ const Game = (props) => {
   useEffect(() => {
     let interval;
     if (!gameOver) {
-      startTimer();
+      startTimer(); // Official time in backend - Firebase record
+      // Display time in the header
       interval = setInterval(() => {
         setTimer((prevTime) => prevTime + 1);
       }, 1000);
@@ -33,12 +35,9 @@ const Game = (props) => {
     await props.stopTimer();
   };
 
-  const formatTimer = (timer) => {
-    const minutes = ("0" + Math.floor((timer / 60) % 60)).slice(-2);
-    const seconds = ("0" + Math.floor(timer % 60)).slice(-2);
-
-    const formattedTimer = `${minutes}:${seconds}`;
-    return formattedTimer;
+  const formatTime = (time) => {
+    const formattedTime = props.formatTime(time);
+    return formattedTime;
   };
 
   // Returns x, y coordinates (in percentages) of mouse click relative to image
@@ -117,6 +116,16 @@ const Game = (props) => {
     stopTimer();
   };
 
+  const displayMessage = () => {
+    const message = document.querySelector(".display-message");
+    message.classList.remove("hidden");
+  };
+
+  const hideMessage = () => {
+    const message = document.querySelector(".display-message");
+    message.classList.add("hidden");
+  };
+
   // CLICK EVENTS
   const handleClickBoard = (e) => {
     const board = document.querySelector(".water-pokemon");
@@ -131,40 +140,57 @@ const Game = (props) => {
     const target = getTarget(targetName, targetInfo);
 
     evaluateTarget(target);
-    console.log(targets);
+    displayMessage();
+    setTimeout(hideMessage, 3000);
   };
 
   const handleClickCharacterLegend = () => {
-    const characterLegend = document.querySelector(".character-legend");
+    const characterLegend = document.querySelector(".characters");
     characterLegend.classList.toggle("hidden");
   };
 
   return (
     <div className="game">
       <div className="header">
-        <div className="logo">Where's Waldo</div>
-        <div className="timer">{formatTimer(timer)}</div>
-        <div className="targets" onClick={handleClickCharacterLegend}>
-          Characters
-          <div className="character-legend hidden">
-            {targets.map((target) => {
-              return (
-                <div key={target.name} className={target.name}>
-                  {target.name}
-                </div>
-              );
-            })}
+        <div className="header-main">
+          <Link className="link" to="/">
+            <div className="logo">Where's Waldo</div>
+          </Link>
+          <div className="timer">{formatTime(timer)}</div>
+          <div
+            className="character-legend"
+            onClick={handleClickCharacterLegend}
+          >
+            Characters
+            <div className="characters hidden">
+              {props.boards[0].targets.map((target) => {
+                return (
+                  <div key={target.name} className="character">
+                    <div className="image-container">
+                      <img
+                        className={target.name}
+                        src={target.imagePath}
+                        alt="character illustration"
+                      />
+                    </div>
+                    <div className="name">{target.name}</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
+        <div className="display-message hidden">{message}</div>
       </div>
       <div className="board">
-        <div className="display-message">{message}</div>
-        <img
-          className="water-pokemon"
-          src={require("../assets/water-pokemon.png")}
-          onClick={handleClickBoard}
-          alt="game board"
-        />
+        <div className="image-container">
+          <img
+            className="water-pokemon"
+            src={require("../assets/water-pokemon.png")}
+            onClick={handleClickBoard}
+            alt="game board"
+          />
+        </div>
         <div className="selection-menu hidden">
           {targets.map((target) => {
             return (
