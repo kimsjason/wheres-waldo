@@ -5,11 +5,11 @@ import Results from "./Results";
 const Game = (props) => {
   const [gameOver, setGameOver] = useState(false);
   const [timer, setTimer] = useState(0);
-  const [targets, setTargets] = useState([
-    { name: "Quagsire", found: false },
-    { name: "Corsola", found: false },
-    { name: "Walrein", found: false },
-  ]);
+  const [targets, setTargets] = useState(
+    props.boards.targets.map((target) => {
+      return { name: target.name, found: false };
+    })
+  );
   const [clickCoordinates, setClickCoordinates] = useState([]);
   const [message, setMessage] = useState();
 
@@ -51,8 +51,8 @@ const Game = (props) => {
     const height = parseInt(
       window.getComputedStyle(element).height.slice(0, -2)
     );
-    const x = Math.round((e.pageX / width) * 100);
-    const y = Math.round((e.pageY / height) * 100);
+    const x = (e.pageX / width) * 100;
+    const y = (e.pageY / height) * 100;
 
     return [x, y];
   };
@@ -61,6 +61,11 @@ const Game = (props) => {
     const selectionMenu = document.querySelector(".selection-menu");
     selectionMenu.classList.toggle("hidden");
     setPosition(selectionMenu, e.pageX, e.pageY);
+  };
+
+  const hideSelectionMenu = () => {
+    const selectionMenu = document.querySelector(".selection-menu");
+    selectionMenu.classList.add("hidden");
   };
 
   const setPosition = (element, x, y) => {
@@ -133,7 +138,7 @@ const Game = (props) => {
 
   // CLICK EVENTS
   const handleClickBoard = (e) => {
-    const board = document.querySelector(".water-pokemon");
+    const board = document.querySelector(".board .image-container");
     const [x, y] = getRelativeCoordinates(e, board);
     setClickCoordinates([x, y]);
     displaySelectionMenu(e);
@@ -147,7 +152,7 @@ const Game = (props) => {
     evaluateTarget(target);
     displayMessage();
     setTimeout(hideMessage, 3000);
-    displaySelectionMenu();
+    hideSelectionMenu();
   };
 
   const handleClickCharacterLegend = () => {
@@ -168,34 +173,39 @@ const Game = (props) => {
             onClick={handleClickCharacterLegend}
           >
             Characters
-            <div className="characters hidden">
-              {props.boards[0].targets.map((target) => {
-                return (
-                  <div key={target.name} className="character">
-                    <div className="image-container">
-                      <img
-                        className={target.name}
-                        src={target.imagePath}
-                        alt="character illustration"
-                      />
-                    </div>
-                    <div className="name">{target.name}</div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
+        </div>
+        <div className="characters hidden">
+          {props.boards.targets.map((target) => {
+            return (
+              <div key={target.name} className="character">
+                <div className="image-container">
+                  <img
+                    className={target.name}
+                    src={target.imagePath}
+                    alt="character illustration"
+                  />
+                </div>
+                <div className="name">{target.name}</div>
+              </div>
+            );
+          })}
         </div>
         <div className="display-message hidden">{message}</div>
       </div>
       <div className="board">
         <div className="image-container">
-          <img
-            className="water-pokemon"
-            src={require("../assets/water-pokemon.png")}
-            onClick={handleClickBoard}
-            alt="game board"
-          />
+          {props.boards.imagePaths.map((imagePath) => {
+            return (
+              <img
+                key={imagePath}
+                className="image-map"
+                src={imagePath}
+                onClick={handleClickBoard}
+                alt="game board"
+              />
+            );
+          })}
         </div>
         <div className="selection-menu hidden">
           {targets.map((target) => {

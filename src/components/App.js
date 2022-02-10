@@ -17,49 +17,86 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 function App() {
   const [docRef, setDocRef] = useState();
   const [leaderboard, setLeaderboard] = useState([]);
-  const [submitName, setSubmitName] = useState([]);
-  const boards = [
-    {
-      board: "Water-Type Pokemon - Blastoise Map",
-      credits: "credits...",
-      imagePath: require("../assets/water-pokemon.png"),
-      targets: [
-        {
-          name: "Quagsire",
-          xMin: "74",
-          xMax: "91",
-          yMin: "20",
-          yMax: "34",
-          imagePath: require("../assets/quagsire.png"),
-          difficulty: "easy",
-        },
-        {
-          name: "Corsola",
-          xMin: "66",
-          xMax: "80",
-          yMin: "74",
-          yMax: "83",
-          imagePath: require("../assets/corsola.png"),
-          difficulty: "medium",
-        },
-        {
-          name: "Walrein",
-          xMin: "25",
-          xMax: "35",
-          yMin: "63",
-          yMax: "75",
-          imagePath: require("../assets/walrein.png"),
-          difficulty: "hard",
-        },
-      ],
-    },
-  ];
+  const [submitName, setSubmitName] = useState();
+  const boards = {
+    board: "Pokemon Color Spectrum",
+    credits: "Gogoatt",
+    imagePaths: [
+      require("../assets/pokemon-color-spectrum-1.png"),
+      require("../assets/pokemon-color-spectrum-2.png"),
+      require("../assets/pokemon-color-spectrum-3.png"),
+      require("../assets/pokemon-color-spectrum-4.png"),
+      require("../assets/pokemon-color-spectrum-5.png"),
+      require("../assets/pokemon-color-spectrum-6.png"),
+      require("../assets/pokemon-color-spectrum-7.png"),
+      require("../assets/pokemon-color-spectrum-8.png"),
+    ],
+    targets: [
+      {
+        name: "Jynx",
+        xMin: "85",
+        xMax: "100",
+        yMin: "20.237",
+        yMax: "22.115",
+        imagePath: require("../assets/jynx.png"),
+      },
+      {
+        name: "Lapras",
+        xMin: "66.417",
+        xMax: "73.6",
+        yMin: "53.167",
+        yMax: "54.706",
+        imagePath: require("../assets/lapras.png"),
+      },
+      {
+        name: "Hitmonchan",
+        xMin: "21.08",
+        xMax: "35.16",
+        yMin: "85.341",
+        yMax: "86.411",
+        imagePath: require("../assets/hitmonchan.png"),
+      },
+      {
+        name: "Ursaring",
+        xMin: "84.6",
+        xMax: "100",
+        yMin: "94.106",
+        yMax: "95.248",
+        imagePath: require("../assets/ursaring.png"),
+      },
+      {
+        name: "Mew",
+        xMin: "0.5",
+        xMax: "10.5",
+        yMin: "11.064",
+        yMax: "11.829",
+        imagePath: require("../assets/mew.png"),
+      },
+    ],
+  };
 
+  // Uncomment function inside useEffect to add targets to the database
   useEffect(() => {
-    // Uncomment line below to add targets to the database
-    // addTargetsToDatabase();
+    // Add targets to Cloud Firestore collection called 'targets'
+    const addTargetsToDatabase = () => {
+      // Store array of pokemon targets, their center coordinates / radius
+      const targets = boards.targets;
 
-    // Gets leaderboard data from Firebase and store in state
+      // Add each pokemon in target array to Cloud Firestore
+      targets.forEach(async (target) => {
+        try {
+          await addDoc(collection(db, "targets"), target);
+        } catch (e) {
+          console.error("Error adding document: ", e);
+        }
+      });
+    };
+
+    // addTargetsToDatabase();
+  }, []);
+
+  // Gets leaderboard data from Firebase and store in state
+  useEffect(() => {
     (async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "times"));
@@ -121,10 +158,9 @@ function App() {
       const docSnap = await getDoc(docRef);
       const record = docSnap.data();
       const time = formatTime(record.endTime - record.startTime);
-      console.log("time is ", time);
       return time;
     } catch (e) {
-      console.error("Error retriving document: "(e));
+      console.error("Error retrieving document: ", e);
     }
   };
 
@@ -134,21 +170,6 @@ function App() {
 
     const formattedTime = `${minutes}:${seconds}`;
     return formattedTime;
-  };
-
-  // Add targets to Cloud Firestore collection called 'targets'
-  const addTargetsToDatabase = () => {
-    // Store array of pokemon targets, their center coordinates / radius
-    const targets = boards[0].targets;
-
-    // Add each pokemon in target array to Cloud Firestore
-    targets.forEach(async (target) => {
-      try {
-        const docRef = await addDoc(collection(db, "targets"), target);
-      } catch (e) {
-        console.error("Error adding document: ", e);
-      }
-    });
   };
 
   const getTargetInfo = async () => {
