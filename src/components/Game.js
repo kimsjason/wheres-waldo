@@ -35,6 +35,11 @@ const Game = (props) => {
     await props.stopTimer();
   };
 
+  const getTime = async () => {
+    const time = await props.getTime();
+    return time;
+  };
+
   const formatTime = (time) => {
     const formattedTime = props.formatTime(time);
     return formattedTime;
@@ -142,6 +147,7 @@ const Game = (props) => {
     evaluateTarget(target);
     displayMessage();
     setTimeout(hideMessage, 3000);
+    displaySelectionMenu();
   };
 
   const handleClickCharacterLegend = () => {
@@ -205,7 +211,11 @@ const Game = (props) => {
           })}
         </div>
       </div>
-      {gameOver ? <Results onSubmitName={onSubmitName} /> : ""}
+      {gameOver ? (
+        <Results onSubmitName={onSubmitName} getTime={getTime} />
+      ) : (
+        ""
+      )}
     </div>
   );
 };

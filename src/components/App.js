@@ -6,6 +6,7 @@ import {
   addDoc,
   getDocs,
   updateDoc,
+  getDoc,
 } from "firebase/firestore";
 import Home from "./Home";
 import Game from "./Game";
@@ -16,6 +17,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 function App() {
   const [docRef, setDocRef] = useState();
   const [leaderboard, setLeaderboard] = useState([]);
+  const [submitName, setSubmitName] = useState([]);
   const boards = [
     {
       board: "Water-Type Pokemon - Blastoise Map",
@@ -53,12 +55,30 @@ function App() {
     },
   ];
 
-  useEffect(async () => {
+  useEffect(() => {
     // Uncomment line below to add targets to the database
     // addTargetsToDatabase();
-    const leaderboard = await getLeaderboard();
-    setLeaderboard(leaderboard);
-  }, []);
+
+    // Gets leaderboard data from Firebase and store in state
+    (async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "times"));
+        const data = [];
+        querySnapshot.forEach((doc) => {
+          data.push(doc.data());
+        });
+        // Filter for records with a valid name - player finished game & entered name
+        const leaderboard = data.filter((record) => {
+          return record.name !== "";
+        });
+        sortLeaderboard(leaderboard);
+        setLeaderboard(leaderboard);
+        setSubmitName(false);
+      } catch (e) {
+        console.error("Error retrieving times from the database", e);
+      }
+    })();
+  }, [submitName]);
 
   // Configure & initialize Firebase
   const firebaseConfig = {
@@ -92,7 +112,19 @@ function App() {
         endTime: new Date(),
       });
     } catch (e) {
-      console.log("Error updating document: ", e);
+      console.error("Error updating document: ", e);
+    }
+  };
+
+  const getTime = async () => {
+    try {
+      const docSnap = await getDoc(docRef);
+      const record = docSnap.data();
+      const time = formatTime(record.endTime - record.startTime);
+      console.log("time is ", time);
+      return time;
+    } catch (e) {
+      console.error("Error retriving document: "(e));
     }
   };
 
@@ -139,26 +171,9 @@ function App() {
       await updateDoc(docRef, {
         name: name,
       });
+      setSubmitName(true);
     } catch (e) {
       console.log("Error updating document: ", e);
-    }
-  };
-
-  const getLeaderboard = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "times"));
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        data.push(doc.data());
-      });
-      // Filter for records with a valid name - player finished game & entered name
-      const leaderboard = data.filter((record) => {
-        return record.name !== "";
-      });
-      sortLeaderboard(leaderboard);
-      return leaderboard;
-    } catch (e) {
-      console.error("Error retrieving times from the database", e);
     }
   };
 
@@ -186,6 +201,7 @@ function App() {
                 boards={boards}
                 startTimer={startTimer}
                 stopTimer={stopTimer}
+                getTime={getTime}
                 formatTime={formatTime}
                 getTargetInfo={getTargetInfo}
                 onSubmitName={handleSubmitName}
@@ -195,11 +211,7 @@ function App() {
           <Route
             path="/leaderboard"
             element={
-              <Leaderboard
-                leaderboard={leaderboard}
-                getLeaderboard={getLeaderboard}
-                formatTime={formatTime}
-              />
+              <Leaderboard leaderboard={leaderboard} formatTime={formatTime} />
             }
           />
         </Routes>
