@@ -5,10 +5,12 @@ const Leaderboard = (props) => {
     return props.formatTime(time);
   };
 
-  console.log(props.leaderboard);
   return (
     <div className="leaderboard">
       <h2 className="leaderboard-title">Leaderboard</h2>
+      <Link to="/">
+        <button>Home</button>
+      </Link>
       <div className="placements">
         <div className="table-header">
           <div className="header-place">Place</div>
@@ -18,7 +20,10 @@ const Leaderboard = (props) => {
         {props.leaderboard.map((record) => {
           const place = props.leaderboard.indexOf(record) + 1;
           return (
-            <div className="player">
+            <div
+              key={record.place + record.name + record.time}
+              className="player"
+            >
               <div className="player-place">{place}</div>
               <div className="player-name">{record.name}</div>
               <div className="player-time">
@@ -28,9 +33,6 @@ const Leaderboard = (props) => {
           );
         })}
       </div>
-      <Link to="/">
-        <button>Home</button>
-      </Link>
     </div>
   );
 };
