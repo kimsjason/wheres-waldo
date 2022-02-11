@@ -1,0 +1,351 @@
+@import url("https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Play&display=swap");
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background: black;
+  color: white;
+  font-family: "Play";
+  font-size: 62.5%;
+}
+
+html,
+body,
+#root,
+.App {
+  height: 100%;
+}
+
+button {
+  width: 100%;
+  height: 50px;
+  padding: 0 25px;
+  border-radius: 10px;
+  border: 2px solid gray;
+  font-family: "Play";
+  font-size: 2rem;
+  font-weight: bold;
+  background: white;
+  cursor: pointer;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+
+button:active {
+  box-shadow: 1px 1px 1px;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:visited {
+  color: white;
+}
+
+/* home page styles */
+.home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: inherit;
+  font-size: 2rem;
+}
+
+.home .header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px;
+}
+
+.game-title {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  font-family: "Press Start 2P";
+  font-size: 4rem;
+}
+
+.logo {
+  width: 350px;
+}
+
+.home .leaderboard {
+  font-size: 3rem;
+}
+
+.home .leaderboard:hover {
+  transform: scale(1.1);
+}
+
+.map {
+  display: flex;
+  justify-content: center;
+}
+
+.map-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10%;
+  border-radius: 0 50px 50px 0;
+  background: white;
+  color: black;
+}
+.map-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.map .image-container {
+  width: 350px;
+}
+
+.map img {
+  border-radius: 50px 0 0 50px;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.credits {
+  font-size: 1.5rem;
+}
+
+.map-content .targets {
+  height: 250px;
+  overflow: scroll;
+}
+
+.illustration {
+  width: 75px;
+}
+
+.target {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+/* game page styles */
+.game {
+  display: flex;
+  flex-direction: column;
+  font-size: 2rem;
+}
+
+.game .header {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  width: 100%;
+}
+
+.header-main {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 50px;
+  background: black;
+  font-size: 3rem;
+}
+
+.header-main .game-title {
+  font-size: 2.5rem;
+}
+
+.header-main .logo {
+  width: 150px;
+}
+
+.display-message {
+  align-self: center;
+  display: flex;
+  border: 1px solid white;
+  border-radius: 5px;
+  margin: 25px;
+  padding: 25px;
+  text-align: center;
+  background: black;
+}
+
+.link {
+  flex: 2;
+}
+
+.timer {
+  flex: 1;
+  text-align: center;
+}
+
+.character-legend {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  cursor: pointer;
+}
+
+.characters {
+  display: flex;
+  align-items: flex-end;
+  text-align: center;
+  background: black;
+  cursor: default;
+}
+
+.character {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 0 50px 25px;
+}
+
+.image-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  cursor: url("../assets/pokeball.png"), auto;
+}
+
+.character img {
+  width: 100%;
+  position: relative;
+}
+
+.found {
+  opacity: 0.25;
+}
+
+.name {
+  flex: 1;
+}
+
+.game .board {
+  display: flex;
+  flex-direction: column;
+}
+
+.selection-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: absolute;
+  padding: 15px 25px;
+  border: 1px solid white;
+  border-radius: 5px;
+  background: black;
+  z-index: 10;
+}
+
+.selection-menu div {
+  cursor: pointer;
+}
+
+.selection-menu div:hover {
+  transform: scale(1.1);
+}
+
+.selection-menu div:active {
+  font-weight: bold;
+}
+
+/* results page styles */
+.results {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 10;
+}
+
+.player-results {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.time {
+  font-size: 6rem;
+}
+
+.player-name-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-name-form input {
+  width: 250px;
+  height: 50px;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 2rem;
+  font-family: "Play";
+}
+
+.navigate {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* leaderboard page styles */
+.leaderboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.leaderboard-title {
+  font-size: 5rem;
+  padding-top: 50px;
+}
+
+.player,
+.table-header {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 25px;
+}
+
+.player > *,
+.table-header > * {
+  padding: 0 25px;
+}
+
+.table-header {
+  border-bottom: 2px solid white;
+  padding: 25px 0;
+}
+
+.leaderboard button {
+  margin-top: 25px;
+}
+
+.hidden {
+  display: none;
+}
