@@ -60,7 +60,7 @@ const Game = (props) => {
   const displaySelectionMenu = (e) => {
     const selectionMenu = document.querySelector(".selection-menu");
     selectionMenu.classList.toggle("hidden");
-    setPosition(selectionMenu, e.pageX, e.pageY);
+    setPosition(e, selectionMenu, e.pageX, e.pageY);
   };
 
   const hideSelectionMenu = () => {
@@ -68,10 +68,28 @@ const Game = (props) => {
     selectionMenu.classList.add("hidden");
   };
 
-  const setPosition = (element, x, y) => {
-    // Offset elements by 25px
-    element.style.left = `${x + 25}px`;
-    element.style.top = `${y + 25}px`;
+  const setPosition = (e, element, x, y) => {
+    const board = document.querySelector(".board .image-container");
+    const [relativeX, relativeY] = getRelativeCoordinates(e, board);
+
+    const width = parseInt(window.getComputedStyle(element).width.slice(0, -2));
+    const height = parseInt(
+      window.getComputedStyle(element).height.slice(0, -2)
+    );
+
+    if (relativeX > 50) {
+      // Offset elements by 25px
+      element.style.left = `${x - width}px`;
+    } else {
+      // Offset elements by 25px
+      element.style.left = `${x + 25}px`;
+    }
+
+    if (relativeY > 98) {
+      element.style.top = `${y - height}px`;
+    } else {
+      element.style.top = `${y + 25}px`;
+    }
   };
 
   // Returns information about targets (name, coordinates, radius) from Firebase
@@ -104,12 +122,20 @@ const Game = (props) => {
       });
       setTargets(updatedTargets);
       setMessage(`You found ${target.name}!`);
+      markTargetFound(target);
       if (checkFoundAll()) {
         endGame();
       }
     } else {
       setMessage("Try again!");
     }
+  };
+
+  const markTargetFound = (target) => {
+    const legendTarget = document
+      .querySelector(`.${target.name}`)
+      .closest(".character");
+    legendTarget.classList.add("found");
   };
 
   // Returns true if all characters found, otherwise false
@@ -165,14 +191,17 @@ const Game = (props) => {
       <div className="header">
         <div className="header-main">
           <Link className="link" to="/">
-            <div className="logo">Where's Waldo</div>
+            <div className="game-title">
+              <div className="text">Where's that</div>
+              <img className="logo" src={props.boards.logoPath} alt="" />
+            </div>{" "}
           </Link>
           <div className="timer">{formatTime(timer)}</div>
           <div
             className="character-legend"
             onClick={handleClickCharacterLegend}
           >
-            Characters
+            Targets
           </div>
         </div>
         <div className="characters hidden">
