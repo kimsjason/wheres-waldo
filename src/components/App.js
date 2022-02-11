@@ -21,6 +21,7 @@ function App() {
   const boards = {
     board: "Pokemon Color Spectrum",
     credits: "Gogoatt",
+    logoPath: require("../assets/pokemon-logo.png"),
     imagePaths: [
       require("../assets/pokemon-color-spectrum-1.png"),
       require("../assets/pokemon-color-spectrum-2.png"),

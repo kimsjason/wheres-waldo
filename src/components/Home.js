@@ -4,22 +4,29 @@ const Home = (props) => {
   return (
     <div className="home">
       <div className="header">
-        <div className="logo">Where's Waldo</div>
+        <div className="game-title">
+          <div className="text">Where's that</div>
+          <img className="logo" src={props.boards.logoPath} alt="" />
+        </div>
         <Link to="/leaderboard" className="leaderboard">
-          Leaderboard
+          <button>Leaderboard</button>
         </Link>
       </div>
       <div className="map">
-        <img
-          className="map-image"
-          src={props.boards[0].imagePath}
-          alt="Preview of map"
-        />
-        <div className="map-info">
-          <div className="title">{props.boards[0].board}</div>
-          <div className="credits">{props.boards[0].credits}</div>
+        <div className="image-container">
+          <img
+            className="map-image"
+            src={props.boards.imagePaths[0]}
+            alt="Preview of map"
+          />
+        </div>
+        <div className="map-content">
+          <div className="map-info">
+            <div className="title">{props.boards.board}</div>
+            <div className="credits">Artwork by {props.boards.credits}</div>
+          </div>
           <div className="targets">
-            {props.boards[0].targets.map((target) => {
+            {props.boards.targets.map((target) => {
               return (
                 <div key={target.name} className="target">
                   <img
@@ -29,14 +36,13 @@ const Home = (props) => {
                   />
                   <div className="target-info">
                     <div className="name">{target.name}</div>
-                    <div className="difficulty">{target.difficulty}</div>
                   </div>
                 </div>
               );
             })}
           </div>
-          <Link to="/game">
-            <button className="start-game">Start Game</button>
+          <Link to="/game" className="start-game">
+            <button>Start Game</button>
           </Link>
         </div>
       </div>
