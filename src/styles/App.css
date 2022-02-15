@@ -17,9 +17,7 @@ html {
 }
 
 html,
-body,
-#root,
-.App {
+body {
   height: 100%;
 }
 
@@ -27,8 +25,9 @@ button {
   width: 100%;
   height: 50px;
   padding: 0 25px;
-  border-radius: 10px;
-  border: 2px solid gray;
+  border-radius: 5px;
+  border-style: double;
+  border: 5px double black;
   font-family: "Play";
   font-size: 2rem;
   font-weight: bold;
@@ -46,6 +45,7 @@ button:active {
 
 a {
   text-decoration: none;
+  color: white;
 }
 
 a:visited {
@@ -59,6 +59,7 @@ a:visited {
   justify-content: center;
   align-items: center;
   height: inherit;
+  margin: 1rem;
   font-size: 2rem;
 }
 
@@ -90,32 +91,38 @@ a:visited {
 }
 
 .map {
+  flex: 1;
   display: flex;
   justify-content: center;
+  padding: 25px;
+}
+
+.map .image-container {
+  flex: 0 0 25%;
+  display: flex;
+  min-width: 0;
+}
+
+.map-image {
+  object-fit: contain;
+  border-radius: 50px 0 0 50px;
 }
 
 .map-content {
-  flex: 1;
+  flex: 0 0 25%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 10%;
+  padding: 3rem;
   border-radius: 0 50px 50px 0;
   background: white;
   color: black;
 }
+
 .map-info {
   display: flex;
   flex-direction: column;
   gap: 5px;
-}
-
-.map .image-container {
-  width: 350px;
-}
-
-.map img {
-  border-radius: 50px 0 0 50px;
 }
 
 .title {
@@ -161,13 +168,19 @@ a:visited {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 25px;
   padding: 25px 50px;
   background: black;
   font-size: 3rem;
 }
 
 .header-main .game-title {
+  white-space: nowrap;
   font-size: 2.5rem;
+}
+
+.game-title .text {
+  flex: 1;
 }
 
 .header-main .logo {
@@ -186,12 +199,12 @@ a:visited {
 }
 
 .link {
-  flex: 2;
+  flex: 1;
 }
 
 .timer {
   flex: 1;
-  text-align: center;
+  text-align: right;
 }
 
 .character-legend {
@@ -203,6 +216,7 @@ a:visited {
 
 .characters {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-end;
   text-align: center;
   background: black;
@@ -213,19 +227,19 @@ a:visited {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 15px;
   padding: 0 50px 25px;
 }
 
 .image-container {
-  flex: 1;
   display: flex;
   flex-direction: column;
   cursor: url("../assets/pokeball.png"), auto;
 }
 
 .character img {
-  width: 100%;
+  width: 100px;
   position: relative;
 }
 
@@ -348,4 +362,110 @@ a:visited {
 
 .hidden {
   display: none;
+}
+
+/* media queries */
+@media only screen and (max-width: 600px) {
+  /* home page styles */
+  .game-title {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+    font-size: 3rem;
+  }
+
+  .logo {
+    width: 200px;
+  }
+
+  .map {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .map .image-container {
+    width: 100%;
+    height: auto;
+  }
+
+  .map-content {
+    width: 100%;
+    gap: 25px;
+  }
+
+  .map-image {
+    width: 100%;
+    height: auto;
+    border-radius: 50px 50px 0 0;
+  }
+
+  .map-content {
+    border-radius: 0 0 50px 50px;
+  }
+
+  /* game page styles */
+  .header-main {
+    justify-content: space-between;
+    padding: 10px;
+    font-size: 1rem;
+  }
+
+  .header-main .game-title {
+    flex-direction: row;
+    font-size: 1rem;
+  }
+  .header-main .logo {
+    width: 75px;
+  }
+
+  .link {
+    flex: 1;
+  }
+
+  .timer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .characters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    text-align: center;
+    background: black;
+    cursor: default;
+  }
+
+  .character {
+    flex: 1 0 30%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 0 50px 25px;
+    font-size: 1rem;
+  }
+
+  .image-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    cursor: url("../assets/pokeball.png"), auto;
+  }
+
+  .character img {
+    width: 50px;
+    position: relative;
+  }
+
+  .game .board img {
+    width: 100%;
+  }
+
+  .hidden {
+    display: none;
+  }
 }
