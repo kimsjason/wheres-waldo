@@ -42,7 +42,7 @@ const Home = (props) => {
             })}
           </div>
           <Link to="/game" className="start-game">
-            <button>Start Game</button>
+            <button>START</button>
           </Link>
         </div>
       </div>
