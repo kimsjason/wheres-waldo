@@ -105,7 +105,7 @@ a:visited {
 
 .map-image {
   object-fit: contain;
-  border-radius: 50px 0 0 50px;
+  border-radius: 15px 0 0 15px;
 }
 
 .map-content {
@@ -114,7 +114,7 @@ a:visited {
   flex-direction: column;
   justify-content: space-between;
   padding: 3rem;
-  border-radius: 0 50px 50px 0;
+  border-radius: 0 15px 15px 0;
   background: white;
   color: black;
 }
